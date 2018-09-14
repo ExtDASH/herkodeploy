@@ -38,7 +38,7 @@ app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 app.use(bodyParser.json({ limit: '50mb' }))
 app.use(morgan('tiny')) //watching for changes
-app.use(express.static(`${__dirname}/client/index.html`))
+// app.use(express.static(`${__dirname}/client/index.html`))
 
 app.post('/uploads', upload.single('Ncsv'), function (req, res, next) {
 	var fileName = req.file.filename
@@ -82,9 +82,9 @@ app.use('/filenames', postName)
 
 app.use('/fileGet', namesRouter)
 
-// app.get('*', (request, response) => {
-// 	response.sendFile(path.join('client/', 'index.html'));
-// });
+app.get('*', (request, response) => {
+	response.sendFile(path.join(__dirname, 'client/', 'index.html'));
+});
 
 mongoose.connect('mongodb://allclients:allclients1@ds021172.mlab.com:21172/yodeldidschecker', { useNewUrlParser: true })
 	.then(() => {
