@@ -83,7 +83,7 @@ app.use('/filenames', postName)
 app.use('/fileGet', namesRouter)
 
 app.get('*', (request, response) => {
-	response.sendFile(path.join(__dirname, 'client/', 'index.html'));
+	response.sendFile(path.join('client/', 'index.html'));
 });
 
 mongoose.connect('mongodb://allclients:allclients1@ds021172.mlab.com:21172/yodeldidschecker', { useNewUrlParser: true })
