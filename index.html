@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	<link href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,500,700,900" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+	<link rel="stylesheet" href="./lib/style.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+	<meta charset="UTF-8">
+	<title>Dupe Finder</title>
+
+</head>
+<body>
+		<div v-cloak data-app id="app">
+			<v-app>
+				<!-- NOTES: 1. LOOK AT HOW WE GOT CSV WORKING. NEED BOTH HTML+JS+BACKEND JS, I REMEMBER I HID THE FILE UPLOAD BUTTON AND HAD IT ACTIVATE IN THE JS WHEN AN 'UPLOAD FILE' BUTTON WAS PRESSED. -->
+<!-- 
+	card template:
+<v-card>
+	<v-card-title>
+	</v-card-title>
+	<v-divider></v-divider>
+	<v-card-text>
+	</v-card-text>
+	<v-divider></v-divider>
+	<v-card-actions>
+		<v-spacer></v-spacer>
+		<v-btn></v-btn>
+		<v-spacer></v-spacer>
+	</v-card-actions>
+</v-card>
+ -->
+				<header id="hero">
+					<h1 class="display-2 font-weight-bold">Welcome to Yodels' Dupe Finder app!</h1>
+					<p class="headline font-weight-thin">Please click the 'Help' button before using the app.</p>
+				</header>
+
+					<v-layout row justify-center>
+						
+						<v-dialog v-model="helpDialog" max-width="400">
+							<v-btn class="topBtns" slot="activator">Help</v-btn>
+							<v-card>
+								<v-card-title class="headline">Dupe Finder Help</v-card-title>
+								<v-card-text class="subheading font-weight-thin" id="bod">
+									To begin with, the server has two databases, Yodels past used and current number aswell as just Dereks Toll Free numbers. Please first select which action you are planning on doing. Selecting the "Find Dupes" radio button will find duplicates.
+									<br>
+									<br>
+									Once you have selected the action, please upload the file you want to use. Once the file is done uploading, select it by clicking the "View Files" button. When uploading your file, please make sure your file has a distinct name, and be sure that it is of CSV format.
+									The naming scheme works like this: 'original file name' + 'UTC time stamp' + '.csv'.
+									<br>
+									<br>
+									Once selecting your file, you can now click the 'Start' button. This will initiate the checking process (if you selected the find dupes option), and display any duplicate entries that it finds in your CSV file.
+									<br>
+									<br>
+									Please ensure that you are using the correct files when adding new numbers to the server. I cannot stress how important this is. If the wrong csv file is used, I will need to clean up the database and reupload numbers. It might be best to check for duplicates FIRST before adding numbers to the database.
+									<br>
+									<br>
+									Thanks for using the app! If you have any questions, please email me at: reid@yodelvoice.com. Please report any bugs to this email aswell.
+								</v-card-text>
+								<v-divider></v-divider>
+								<v-card-actions>
+									<v-spacer></v-spacer>
+									<v-btn class="dotTxt" @click="helpDialog = false">Okay</v-btn>
+									<v-spacer></v-spacer>
+								</v-card-actions>
+							</v-card>
+						</v-dialog>
+
+						<v-dialog v-model="numsDialog" scrollable max-width="300px">
+							<v-btn class="topBtns" @click="viewNums" slot="activator">View Base Numbers</v-btn>
+							<v-card>
+								<v-card-title>
+									<h3 class="headline mb-0">Base Numbers</h3><br>
+									<h3 class="headline dotTxt">Total: {{ baseNums.length }}</h3>
+								</v-card-title>
+								<v-divider></v-divider>
+								<v-card-text style="height: 300px;">
+									<div class="text-xs-center">
+										<p class="dotTxt" v-for="item in baseNums">
+											{{ item }}
+										</p>
+									</div>
+								</v-card-text>
+								<v-divider></v-divider>
+								<v-card-actions>
+									<v-spacer></v-spacer>
+									<v-btn class="dotTxt" @click="numsDialog = false">Okay</v-btn>
+									<v-spacer></v-spacer>
+								</v-card-actions>
+							</v-card>
+						</v-dialog>
+
+						<v-dialog v-model="yodelNumsDialog" scrollable max-width="300px">
+							<v-btn class="topBtns" slot="activator">View Yodel Numbers</v-btn>
+							<v-card>
+								<v-card-title>
+									<p class="headline mb-0">Yodel Numbers</p>
+									<p class="headline dotTxt">Total: {{ yodelMainNums.length }}</p>
+								</v-card-title>
+								<v-divider></v-divider>
+								<v-card-text style="height: 300px;">
+									<div class="text-xs-center">
+										
+										<p class="dotTxt" v-for="item in yodelMainNums">
+											{{ item }}
+										</p>
+
+									</div>
+								</v-card-text>
+								<v-divider></v-divider>
+								<v-card-actions>
+									<v-spacer></v-spacer>
+									<v-btn class="dotTxt" @click="yodelNumsDialog = false">Okay</v-btn>
+									<v-spacer></v-spacer>
+								</v-card-actions>
+							</v-card>
+						</v-dialog>
+						<!-- DB SWITCHING -->
+						<!-- DB SWITCHING -->
+						<!-- DB SWITCHING -->
+						<!-- DB SWITCHING -->
+						<!-- DB SWITCHING -->
+						<!-- NEED TO RE-ENABLE BUTTON AT SOME POINT -->
+						<v-dialog v-model="dbDialog" scrollable max-width="400px">
+							<v-btn class="dotTxt topBtns" disabled>Select Database</v-btn>
+							<v-card>
+								<v-card-title>
+									<h3 class="headline dotTxt">Which Database would you like to switch to?</h3>
+								</v-card-title>
+								<v-divider></v-divider>
+								<v-card-text>
+									<v-radio-group class="dotTxt" v-model="database">
+										<v-radio label="Dereks Numbers" value="dereks"></v-radio>
+										<v-radio label="Main Yodel Numbers" value="yodels"></v-radio>
+										<!-- <v-radio label="Upload Owned Numbers" value="upldOwned"></v-radio> -->
+									</v-radio-group>
+								</v-card-text>
+								<v-divider></v-divider>
+								<v-card-actions>
+									<v-spacer></v-spacer>
+									<v-btn @click="switchTo" :disabled="switchDis" class="dotTxt">Okay</v-btn>
+									<v-btn @click="closeSwitch" class="dotTxt">Cancel</v-btn>
+									<v-spacer></v-spacer>
+								</v-card-actions>
+							</v-card>
+						</v-dialog>
+
+						<v-dialog v-model="switchingDB" persistent width="300">
+							<v-card color="primary" dark>
+								<v-card-text class="dotTxt subheading">
+									Switching to {{ selectedDB }}...
+									<v-progress-linear indeterminate color="white" class="mb-0"></v-progress-linear>
+								</v-card-text>
+							</v-card>
+						</v-dialog>
+						<!-- DB SWITCHING -->
+						<!-- DB SWITCHING -->
+						<!-- DB SWITCHING -->
+						<!-- DB SWITCHING -->
+						<!-- DB SWITCHING -->
+
+
+					</v-layout>
+
+					<v-dialog v-model="loadingBase" persistent width="300">
+						<v-card color="primary" dark>
+							<v-card-text class="dotTxt subheading">
+								Loading numbers...
+								<v-progress-linear indeterminate color="white" class="mb-0"></v-progress-linear>
+							</v-card-text>
+						</v-card>
+					</v-dialog>
+
+
+					<v-container fluid>
+						<v-layout row justify-center>
+							<!-- <v-container class="padZ"> -->
+							<v-card max-width="400">
+								<v-card-title class="headline">Options</v-card-title>
+								<v-divider></v-divider>
+								<v-card-text class="subheading">
+									<v-radio-group v-model="options">
+										<v-radio label="Dupes" value="dupes"></v-radio>
+										<!-- <v-radio label="Add New Numbers" value="addNewBase"></v-radio> -->
+										<!-- <v-radio label="Upload Owned Numbers" value="upldOwned"></v-radio> -->
+									</v-radio-group>
+								</v-card-text>
+								<v-divider></v-divider>
+								<v-card-actions>
+									<v-spacer></v-spacer>
+									
+									
+									<v-btn @click="initMain" id="start">Start</v-btn>
+									<!-- <v-btn @click="checkerTwo(thashmap)" style="display: none;" id="strtBtn">Start2</v-btn> -->
+									<v-spacer></v-spacer>
+								</v-card-actions>
+							</v-card>
+						</v-layout>
+						<v-layout class="marginize">
+							<v-spacer></v-spacer>
+							<form method="POST" action="/upload" id="myForm" enctype="multipart/form-data">
+								<input type="file" name="Ncsv" style="display: none;" id="myFile" accept=".csv"/>
+								<v-btn @click="getFile">Browse Your Files</v-btn>
+								<v-btn id="uploader" @click="readFile">Upload</v-btn>
+								<v-btn @click="viewFilesDialog = true">Select Uploaded File</v-btn>
+							</form>
+							<v-spacer></v-spacer>
+						</v-layout>
+					</v-container>
+					
+					<!-- DUPES CARD -->
+					<!-- DUPES CARD -->
+					<!-- DUPES CARD -->
+					<!-- DUPES CARD -->
+					<!-- DUPES CARD -->
+					<v-dialog v-model="dupesDialog" scrollable width="450">
+						<v-card v-model="tdupes" v-if="tdupes != null" id="dupesCard" max-height="450">
+							<v-card-title>
+								
+									<p class="headline">Dupes</p>
+									<br>
+									<p class="headline dotTxt">Total: {{ tdupes.length }}</p>
+							
+							</v-card-title>
+							<v-divider></v-divider>
+							<v-card-text class="subheading">
+								
+									<div class="text-xs-center">
+										<p class="dotTxt" v-for="item in tdupes">
+											{{ item }}
+										</p>
+									</div>
+								
+							</v-card-text>
+							<v-divider></v-divider>
+							<v-card-actions>
+								<v-spacer></v-spacer>
+								<v-btn @click="dupesDialog = false" class="dotTxt">Okay</v-btn>
+								<v-btn @click="fileExport" class="dotTxt">Export</v-btn>
+								<v-spacer></v-spacer>
+							</v-card-actions>
+						</v-card>
+					</v-dialog>
+
+					<v-dialog v-model="loadDialog" persistent width="300">
+						<v-card color="primary" dark>
+							<v-card-text class="dotTxt subheading">
+								Checking for duplicates...
+								<v-progress-linear indeterminate color="white" class="mb-0"></v-progress-linear>
+							</v-card-text>
+						</v-card>
+					</v-dialog>
+					<!-- DUPES CARD -->
+					<!-- DUPES CARD -->
+					<!-- DUPES CARD -->
+					<!-- DUPES CARD -->
+					<!-- DUPES CARD -->
+					<v-dialog v-model="addDialog" persistent width="300">
+						<v-card color="primary" dark>
+							<v-card-text class="dotTxt subheading">
+								Adding numbers to {{ selectedDB }}...
+								<v-progress-linear indeterminate color="white" class="mb-0"></v-progress-linear>
+							</v-card-text>
+						</v-card>
+					</v-dialog>
+
+					<v-dialog scrollable width="500" v-model="viewFilesDialog">
+						<v-card max-height="400">
+							<v-card-title class="headline">File Viewer</v-card-title>
+							<v-divider></v-divider>
+							<v-card-text>
+								<v-radio-group v-model="fileSelector">
+									<v-radio class="dotTxt" v-for="item in filesViewer" :key="item" :label="item" :value="item"></v-radio>
+								</v-radio-group>
+								<div v-if="!filesViewer.length"><p class="dotTxt text-xs-center subheading">Nothing found. Please upload a file.</p></div>	
+							</v-card-text>
+							<v-divider></v-divider>
+							<v-card-actions>
+								<v-spacer></v-spacer>
+									<v-btn class="dotTxt" @click="viewFilesDialog = false">Close</v-btn>
+									<v-btn class="dotTxt" @click="setFile">Okay</v-btn>
+								<v-spacer></v-spacer>
+							</v-card-actions>
+						</v-card>
+					</v-dialog>
+
+					<v-dialog v-model="uploadingFile" persistent width="300">
+						<v-card color="primary" dark>
+							<v-card-text class="dotTxt subheading">
+								Uploading file...
+								<v-progress-linear indeterminate color="white" class="mb-0"></v-progress-linear>
+							</v-card-text>
+						</v-card>
+					</v-dialog>
+
+					
+
+
+					<!-- SNACKBARS -->
+					<!-- SNACKBARS -->
+					<!-- SNACKBARS -->
+					<!-- SNACKBARS -->
+					<!-- SNACKBARS -->
+					<!-- SNACKBARS -->
+					<v-snackbar v-model="loadedSnack" :timeout="timeout" color="success">
+						Numbers loaded successfully!
+					</v-snackbar>
+
+					<v-snackbar v-model="optSnack" :timeout="timeout" color="error">
+						Please select an option
+					</v-snackbar>
+
+					<v-snackbar v-model="fileSnack" :timeout="timeout" color="success">
+						Successfully uploaded file!
+					</v-snackbar>
+
+					<v-snackbar v-model="fileSelSnack" :timeout="timeout" color="success">
+						You have selected {{ fileSelector }}
+					</v-snackbar>
+
+					<v-snackbar v-model="dupesSnack" :timeout="zeroTime" color="warning">
+						Please select a file by clicking the<br>
+						View Files button.
+						<v-btn dark flat @click="dupesSnack = false">Okay</v-btn>
+					</v-snackbar>
+
+					<v-snackbar v-model="upldNewSnack" :timeout="zeroTime" color="warning">
+						Please select a file by clicking the<br>
+						View Files button.
+						<v-btn dark flat @click="upldNewSnack = false">Okay</v-btn>
+					</v-snackbar>
+
+					<v-snackbar v-model="switchedDerek" :timeout="timeout" color="success">
+						Successfully switched to Dereks Toll Free Numbers
+						<v-btn dark flat @click="switchedDerek = false">Okay</v-btn>
+					</v-snackbar>
+
+					<v-snackbar v-model="switchedYodel" :timeout="timeout" color="success">
+						Successfully switched to Yodels Global Batch
+						<v-btn dark flat @click="switchedYodel = false">Okay</v-btn>
+					</v-snackbar>
+					<!-- SNACKBARS -->
+					<!-- SNACKBARS -->
+					<!-- SNACKBARS -->
+					<!-- SNACKBARS -->
+					<!-- SNACKBARS -->
+					<!-- SNACKBARS -->					
+			</v-app>
+		</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
+	<script src="https://unpkg.com/jquery@3.3.1/dist/jquery.js"></script>
+	<script src="./main.js" type="module"></script>
+	<script src="./subprev.js" type="module"></script>
+	<script src="./helper/api.js" type="module"></script>
+
+</body>
+</html>

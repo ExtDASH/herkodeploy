@@ -1,0 +1,11 @@
+// $('#myForm').submit(function(e){
+//     e.preventDefault();
+//     $.ajax({
+//         url:'/upload',
+//         type:'post',
+//         data:$('#myFile').files,
+//         success:function(){
+//             console.log($('#myFile'))
+//         }
+//     });
+// });

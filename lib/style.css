@@ -1,0 +1,40 @@
+#hero{
+	background-color: #424242;
+	color: white;
+	text-align: center;
+	padding-top: 2rem;
+	padding-bottom: 2rem;
+}
+
+.topBtns{
+	font-family: 'Roboto', sans-serif;
+	font-size: 1rem;
+	margin-top: 2rem;
+	margin-bottom: 2rem;
+}
+
+.marginize{
+	margin-top: 2rem;
+}
+
+.marginL{
+	margin-left: 2rem;
+}
+
+.padZ {
+	padding: 0;
+}
+
+.dotTxt{
+	font-family: 'Roboto', sans-serif;
+}
+
+#bod{
+	font-family: 'Roboto', sans-serif;
+}
+
+
+
+[v-cloak]{
+	display:none;
+}
