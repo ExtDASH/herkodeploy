@@ -20,7 +20,7 @@ const app = express()
 
 var storage = multer.diskStorage({
 	destination: function (req, file, cb) {
-	    cb(null, './uploads')
+	    cb(null, __dirname+'/uploads')
 	},
 	filename: function (req, file, cb) {
 	  	var newName = file.originalname.split(/\W+/g)
@@ -72,7 +72,7 @@ const postName = (name) => {
 	})
 }
 
-app.use('/uploads', filesRouter)
+//app.use('/uploads', filesRouter)
 
 app.use('/getnums', getRouter)
 
@@ -80,7 +80,7 @@ app.use('/compute', computeRouter)
 
 app.use('/filenames', postName)
 
-app.use('/fileGet', namesRouter)
+//app.use('/fileGet', namesRouter)
 
 app.get('*', (request, response) => {
 	response.sendFile(path.join(__dirname, 'client/', 'index.html'));
