@@ -18,18 +18,18 @@ const path = require('path')
 
 const app = express()
 
-// var storage = multer.diskStorage({
-// 	destination: function (req, file, cb) {
-// 	    cb(null, __dirname+'/uploads')
-// 	},
-// 	filename: function (req, file, cb) {
-// 	  	var newName = file.originalname.split(/\W+/g)
-// 	  	var fullName = `${newName[0]}${Date.now()}.csv`
-// 	    cb(null, fullName)
-// 	},
-// })
+let storage = multer.diskStorage({
+	destination: function (req, file, cb) {
+	    cb(null, __dirname+'/uploads')
+	},
+	filename: function (req, file, cb) {
+	  	let newName = file.originalname.split(/\W+/g)
+	  	let fullName = `${newName[0]}${Date.now()}.csv`
+	    cb(null, fullName)
+	},
+})
 
-let storage = multer.memoryStorage()
+// let storage = multer.memoryStorage()
 
 let upload = multer({ storage: storage })
 
