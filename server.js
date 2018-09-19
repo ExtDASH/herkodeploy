@@ -86,7 +86,10 @@ app.get('*', (request, response) => {
 	response.sendFile(path.join(__dirname, 'client/', 'index.html'));
 });
 
-app.use(express.static(`${__dirname}/uploads`))
+app.get('*', (request, response) => {
+	response.sendFile(path.join(__dirname, 'uploads/'));
+});
+
 
 
 
