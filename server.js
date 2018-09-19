@@ -18,24 +18,20 @@ const path = require('path')
 
 const app = express()
 
-var storage = multer.diskStorage({
-	destination: function (req, file, cb) {
-	    fs.ensureFile(file)
-		.then(() => {
-		    console.log('done')
-		 }
-	    cb(null, __dirname+'/uploads')
-	},
-	filename: function (req, file, cb) {
-	  	var newName = file.originalname.split(/\W+/g)
-	  	var fullName = `${newName[0]}${Date.now()}.csv`
-	    cb(null, fullName)
-	},
-})
+// var storage = multer.diskStorage({
+// 	destination: function (req, file, cb) {
+// 	    cb(null, __dirname+'/uploads')
+// 	},
+// 	filename: function (req, file, cb) {
+// 	  	var newName = file.originalname.split(/\W+/g)
+// 	  	var fullName = `${newName[0]}${Date.now()}.csv`
+// 	    cb(null, fullName)
+// 	},
+// })
 
+let storage = multer.memoryStorage()
 
-
-var upload = multer({ storage: storage })
+let upload = multer({ storage: storage })
 
 app.use(express.json({limit: '50mb'}))
 app.use(bodyParser.urlencoded({extended: false}))
@@ -45,7 +41,7 @@ app.use(morgan('tiny')) //watching for changes
 // app.use(express.static(`${__dirname}/client/index.html`))
 
 app.post('/uploads', upload.single('Ncsv'), function (req, res, next) {
-	var fileName = req.file.filename
+	let fileName = req.file.filename
 	nFs.create({
 		name: fileName
 	})
