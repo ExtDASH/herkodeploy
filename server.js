@@ -86,6 +86,10 @@ app.get('*', (request, response) => {
 	response.sendFile(path.join(__dirname, 'client/', 'index.html'));
 });
 
+app.use(express.static(`${__dirname}/uploads`))
+
+
+
 mongoose.connect('mongodb://allclients:allclients1@ds021172.mlab.com:21172/yodeldidschecker', { useNewUrlParser: true })
 	.then(() => {
 		const PORT = process.env.PORT || 3000;
