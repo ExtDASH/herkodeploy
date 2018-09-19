@@ -20,6 +20,10 @@ const app = express()
 
 var storage = multer.diskStorage({
 	destination: function (req, file, cb) {
+	    fs.ensureFile(file)
+		.then(() => {
+		    console.log('done')
+		 }
 	    cb(null, __dirname+'/uploads')
 	},
 	filename: function (req, file, cb) {
